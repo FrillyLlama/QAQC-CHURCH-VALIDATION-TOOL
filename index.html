@@ -266,7 +266,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const areasServedLower = areasServed.toLowerCase();
 
         if (areasServedLower === 'other (list in comments)') {
-		    	if (!/\barea served:\b/.test(commentLower)) {
+		    	if (!commentLower.includes('area served:')) {
 		        errors.push({
 		            field: 'att_Validation Comment',
 	                value: validationComment,
