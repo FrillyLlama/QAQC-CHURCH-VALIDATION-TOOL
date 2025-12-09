@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 value: row['att_Areas Served'], 
                 reason: 'Areas Served cannot be blank.', 
                 category: 'Missing Required Data' });
-        if ((row['TagID'] || '').trim() === '' && (row['Reason Not Tagged'] || '').trim() === '') 
+        if ((row['TagID'] || '').trim() !== '' && (row['Reason Not Tagged'] || '').trim() !== '') 
             errors.push({ 
                 field: 'TagID', 
                 value: row['(empty)'], 
@@ -366,9 +366,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (spaceFloor === 'Building Exterior' && environment !== 'Extremes of temperature') {
             errors.push({ field: 'Environment', value: environment, reason: 'For Building Exterior space, Environment must be "Extremes of temperature".', category: 'Miscellaneous Errors' });
-        }
-		if (spaceFloor === 'Basement' && environment !== 'Liable to extreme dust or flooding') {
-            errors.push({ field: 'Environment', value: environment, reason: 'For Basement space, Environment must be "Liable to extreme dust or flooding".', category: 'Miscellaneous Errors' });
         }
         
         const capacityQty = row['att_Capacity Quantity'];
