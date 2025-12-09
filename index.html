@@ -225,12 +225,13 @@ document.addEventListener('DOMContentLoaded', function() {
             return errors; 
         }
 
-        if ((row['att_Area Served'] || '').trim() === '') 
+        if ((row['att_Area Served'] || '').trim() !== '') 
             errors.push({ 
                 field: 'att_Areas Served', 
                 value: row['att_Areas Served'], 
                 reason: 'Areas Served cannot be blank.', 
-                category: 'Missing Required Data' });
+                category: 'Missing Required Data'});
+
         if ((row['TagID'] || '').trim() !== '' && (row['Reason Not Tagged'] || '').trim() !== '') 
             errors.push({ 
                 field: 'TagID', 
