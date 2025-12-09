@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const rule = validationRules[assetAcronym];
         const isTagOnPM = (row['Reason Not Tagged'] || '').trim().toLowerCase() === 'tag on pm (put reason in comments)';
         const isNotFoundPlaceholder = (row['Reason Not Tagged'] || '').trim() === 'Not Found' && !row['TagID'];
-
+        
         if (assetNumber.startsWith('TEMPLATE') && row['TagID'] !== 'DELETE') {
             errors.push({ field: 'TagID', value: row['TagID'], reason: 'Template asset must be marked for deletion with TagID = "DELETE".', category: 'Template Rows to Delete' });
             return errors;
@@ -205,6 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (row['att_Space (Floor)'] !== 'Not Found') errors.push({ field: 'att_Space (Floor)', value: row['att_Space (Floor)'], reason: 'Floor must be "Not Found".', category: 'Missing Required Data' });
             if (row['att_Room'] !== 'Not Found') errors.push({ field: 'att_Room', value: row['att_Room'], reason: 'Room must be "Not Found".', category: 'Missing Required Data' });
             if ((row['att_Area Served'] || '').trim() === '') errors.push({ field: 'att_Areas Served', value: row['att_Areas Served'], reason: 'Areas Served cannot be blank.', category: 'Missing Required Data' });
+            if ((row['att_Asset #'] || '').trim('assetAcronym' && '-' && '') === '') errors.push({ field: 'att_Asset #', value: row['(empty)'], reason: 'Asset # cannot be blank.', category: 'Missing Required Data' });
             const noNameplate = "No Nameplate Information Available";
             if (row['att_Manufacturer'] !== noNameplate) errors.push({ field: 'att_Manufacturer', value: row['att_Manufacturer'], reason: `Must be "${noNameplate}".`, category: 'Missing Required Data' });
             if (row['att_Model'] !== noNameplate) errors.push({ field: 'att_Model', value: row['att_Model'], reason: `Must be "${noNameplate}".`, category: 'Missing Required Data' });
@@ -223,6 +224,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             return errors; 
         }
+
+        if ((row['att_Area Served'] || '').trim() === '') 
+            errors.push({ 
+                field: 'att_Areas Served', 
+                value: row['att_Areas Served'], 
+                reason: 'Areas Served cannot be blank.', 
+                category: 'Missing Required Data' });
+        if ((row['TagID'] || '').trim() === '' && (row['Reason Not Tagged'] || '').trim() === '') 
+            errors.push({ 
+                field: 'TagID', 
+                value: row['(empty)'], 
+                reason: 'TagID cannot be blank.', 
+                category: 'Missing Required Data' });
 
         const roomName = row['att_Room'] || '';
         if (roomName) {
@@ -1082,20 +1096,29 @@ document.addEventListener('DOMContentLoaded', function() {
             const originalFileName = fileInput.files[0] ? fileInput.files[0].name.replace('.csv', '') : 'Asset_Report';
             let allErrorsForCSV = [];
 	        for (const workZone in allReportsData) {
-	            const report = allReportsData[workZone];
-	            report.errors.forEach(error => { 
-	                allErrorsForCSV.push({
-	                    "Work Zone": workZone,
-	                    "Ninox ID": error.ninoxId || 'N/A',
-	                    "Asset #": error.assetNum || 'N/A',
-	                    "Error Category": error.category,
-	                    "Row #": error.rowNum,
-	                    "Field with Error": error.field || 'Work Zone-wide',
-	                    "Invalid Value": String(error.value || 'N/A'),
-	                    "Reason for Error": error.reason
-	                });
-	            });
-	        }
+                const report = allReportsData[workZone];
+                report.errors.forEach(error => { 
+                    // Find matching row for asset number
+                    let reasonNotTagged = 'N/A';
+                    if (report.data && error.assetNum) {
+                        const matchingRow = report.data.find(
+                            r => r['att_Asset #'] === error.assetNum
+                        );
+                        if (matchingRow) reasonNotTagged = matchingRow['Reason Not Tagged'] || 'N/A';
+                    }
+                    allErrorsForCSV.push({
+                        "Work Zone": workZone,
+                        "Ninox ID": error.ninoxId || 'N/A',
+                        "Reason Not Tagged": reasonNotTagged,
+                        "Asset #": error.assetNum || 'N/A',
+                        "Error Category": error.category,
+                        "Row #": error.rowNum,
+                        "Field with Error": error.field || 'Work Zone-wide',
+                        "Invalid Value": String(error.value || 'N/A'),
+                        "Reason for Error": error.reason
+                    });
+                });
+            }
             if (allErrorsForCSV.length === 0) {
                 console.log("No errors to report!");
                 return;
