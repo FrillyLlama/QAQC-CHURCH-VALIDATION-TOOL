@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isNotFoundPlaceholder) {
             if (row['att_Space (Floor)'] !== 'Not Found') errors.push({ field: 'att_Space (Floor)', value: row['att_Space (Floor)'], reason: 'Floor must be "Not Found".', category: 'Missing Required Data' });
             if (row['att_Room'] !== 'Not Found') errors.push({ field: 'att_Room', value: row['att_Room'], reason: 'Room must be "Not Found".', category: 'Missing Required Data' });
-            if (!row['att_Areas Served']) errors.push({ field: 'att_Areas Served', value: row['att_Areas Served'], reason: 'Areas Served cannot be blank.', category: 'Missing Required Data' });
+            if ((row['att_Area Served'] || '').trim() === '') errors.push({ field: 'att_Areas Served', value: row['att_Areas Served'], reason: 'Areas Served cannot be blank.', category: 'Missing Required Data' });
             const noNameplate = "No Nameplate Information Available";
             if (row['att_Manufacturer'] !== noNameplate) errors.push({ field: 'att_Manufacturer', value: row['att_Manufacturer'], reason: `Must be "${noNameplate}".`, category: 'Missing Required Data' });
             if (row['att_Model'] !== noNameplate) errors.push({ field: 'att_Model', value: row['att_Model'], reason: `Must be "${noNameplate}".`, category: 'Missing Required Data' });
