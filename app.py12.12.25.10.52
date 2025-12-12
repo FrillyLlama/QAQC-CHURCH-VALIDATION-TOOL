@@ -445,5 +445,3 @@ def ai_audit():
     except Exception as e:
         print(f"API Error: {e}")
         return jsonify({"error": str(e)}), 500
-
-# [KEEP THE APP.RUN BLOCK AT THE END]
